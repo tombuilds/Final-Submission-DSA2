@@ -69,33 +69,44 @@ def solve_maze_las_vegas(maze):
     path = []
     directions = [(1, 0), (0, 1), (-1, 0), (0, -1)]
 
-    x, y = 9, 0
+    x, y = 9, 0  # Starting position
     steps = 0
-    while steps < 400 and not (x == rows - 1):
+    exit_found = False
+    while steps < 400:
         if maze[y, x] == 0 and solution[y, x] == 0:
             solution[y, x] = 1
             path.append((x, y))
-            print(f"Visiting: ({x}, {y}), Steps: {steps}") # Debug statement
-            if x == rows - 1:
-                print("Exit found!") # Debug statement
+            print(f"Visiting: ({x}, {y}), Steps: {steps}")  # Debug statement
+            if (x == cols - 1 or y == rows - 1):
+                print("Exit found!")  # Debug statement
+                exit_found = True
                 break
             random.shuffle(directions)
+            move_found = False
             for dx, dy in directions:
-                if 0 <= x + dx < rows and 0 <= y + dy < cols and maze[x + dx, y + dy] == 0 and solution[x + dx, y + dy] == 0:
-                    x, y = x + dx, y + dy
+                new_x, new_y = x + dx, y + dy
+                if 0 <= new_x < cols and 0 <= new_y < rows and maze[new_y, new_x] == 0 and solution[new_y, new_x] == 0:
+                    x, y = new_x, new_y
+                    move_found = True
                     break
+            if not move_found:
+                # If no valid move is found, restart from a random location
+                x, y = random.randint(0, rows - 1), random.randint(0, cols - 1)
+        else:
+            # If the current position is invalid, restart from a random location
+            x, y = random.randint(0, rows - 1), random.randint(0, cols - 1)
         steps += 1
 
-    if x != rows - 1:
-        print("No solution found in 400 steps")
+    if not exit_found and steps >= 400:
+        print("Reached maximum steps without finding an exit")
     return solution, path
 
 # Ask the user for the approach
-approach = input("Choose an approach (Backtracking or Las Vegas): ").strip().lower()
+approach = input("Choose an approach (1 for Backtracking, 2 for Las Vegas): ").strip()
 
-if approach == "backtracking":
+if approach == "1":
     solution, path = solve_maze_backtracking(resized_maze)
-elif approach == "las vegas":
+elif approach == "2":
     solution, path = solve_maze_las_vegas(resized_maze)
 else:
     print("Invalid approach selected")
@@ -103,13 +114,13 @@ else:
 
 # Visualize visited squares in both successful and unsuccessful attempts
 def visualize_path(maze, path, title): 
-    # Make a copy of the maze so we don't change the original
-    maze_copy = maze.copy()
+    # Convert the maze to a floating-point array to handle all values correctly
+    maze_copy = maze.astype(float).copy()
     # Mark the squares we visited on the path
     for x, y in path:
         maze_copy[y, x] = 0.5 # 0.5 makes the path show up in black
     # Display the maze with the path
-    plt.imshow(maze_copy, cmap='gray_r')
+    plt.imshow(maze_copy, cmap='gray_r', vmin=0, vmax=1)
     plt.title(title)
     plt.show()
 
