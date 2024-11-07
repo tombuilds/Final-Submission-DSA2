@@ -40,21 +40,21 @@ def solve_maze_backtracking(maze):
     path = []
 
     def is_safe(x, y):
-        return 0 <= x < rows and 0 <= y < cols and maze[y, x] == 0 and solution[x, y] == 0
+        return 0 <= x < rows and 0 <= y < cols and maze[y, x] == 0 and solution[y, x] == 0
 
     def backtrack(x, y):
         print(f"Visiting: ({x}, {y})") # Debug statement
-        if x == rows - 1:  # Exit found
-            solution[x, y] = 1
+        if (x == cols - 1 or y == rows - 1) and maze[y, x] == 0:
+            solution[y, x] = 1
             path.append((x, y))
             print("Exit found!") # Debug statement
             return True
         if is_safe(x, y):
-            solution[x, y] = 1
+            solution[y, x] = 1
             path.append((x, y))
             if backtrack(x + 1, y) or backtrack(x, y + 1) or backtrack(x - 1, y) or backtrack(x, y - 1):
                 return True
-            solution[x, y] = 0
+            solution[y, x] = 0
             path.pop()
             print(f"Backtracking from: ({x}, {y})") # Debug statement
         return False
@@ -72,8 +72,8 @@ def solve_maze_las_vegas(maze):
     x, y = 9, 0
     steps = 0
     while steps < 400 and not (x == rows - 1):
-        if maze[x, y] == 0 and solution[x, y] == 0:
-            solution[x, y] = 1
+        if maze[y, x] == 0 and solution[y, x] == 0:
+            solution[y, x] = 1
             path.append((x, y))
             print(f"Visiting: ({x}, {y}), Steps: {steps}") # Debug statement
             if x == rows - 1:
@@ -107,7 +107,7 @@ def visualize_path(maze, path, title):
     maze_copy = maze.copy()
     # Mark the squares we visited on the path
     for x, y in path:
-        maze_copy[x, y] = 0.5 # 0.5 makes the path show up in black
+        maze_copy[y, x] = 0.5 # 0.5 makes the path show up in black
     # Display the maze with the path
     plt.imshow(maze_copy, cmap='gray_r')
     plt.title(title)
