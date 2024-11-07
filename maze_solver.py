@@ -9,8 +9,27 @@ maze_img = mpimg.imread('maze-2.png')
 # Convert the image to a binary maze (0 for paths, 1 for walls)
 maze = (np.mean(maze_img, axis=2) < 0.5).astype(int)  # Adjust threshold if necessary
 
-# Display the maze
-plt.imshow(maze, cmap='gray_r') # Use 'gray_r' to invert colors for display
+# Find the bounding box manually
+rows = np.any(maze, axis=1)
+cols = np.any(maze, axis=0)
+min_row, max_row = np.where(rows)[0][0], np.where(rows)[0][-1] + 1
+min_col, max_col = np.where(cols)[0][0], np.where(cols)[0][-1] + 1
+
+# Crop the maze using the bounding box coordinates
+cropped_maze = maze[min_row:max_row, min_col:max_col]
+
+# Resize the cropped maze to 21x21 using interpolation
+resized_maze = np.zeros((21, 21), dtype=int)
+scale_y, scale_x = cropped_maze.shape[0] / 21, cropped_maze.shape[1] / 21
+
+for y in range(21):
+    for x in range(21):
+        orig_y, orig_x = int(y * scale_y), int(x * scale_x)
+        resized_maze[y, x] = cropped_maze[orig_y, orig_x]
+
+# Display the resized maze
+plt.imshow(resized_maze, cmap='gray_r')
+plt.axis('off')  # Hide the axes
 plt.title('Maze')
 plt.show()
 
@@ -21,7 +40,7 @@ def solve_maze_backtracking(maze):
     path = []
 
     def is_safe(x, y):
-        return 0 <= x < rows and 0 <= y < cols and maze[x, y] == 0 and solution[x, y] == 0
+        return 0 <= x < rows and 0 <= y < cols and maze[y, x] == 0 and solution[x, y] == 0
 
     def backtrack(x, y):
         print(f"Visiting: ({x}, {y})") # Debug statement
@@ -40,7 +59,7 @@ def solve_maze_backtracking(maze):
             print(f"Backtracking from: ({x}, {y})") # Debug statement
         return False
 
-    if not backtrack(0, 0):
+    if not backtrack(95, 0):
         print("No solution found")
     return solution, path
 
