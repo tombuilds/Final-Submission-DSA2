@@ -59,7 +59,7 @@ def solve_maze_backtracking(maze):
             print(f"Backtracking from: ({x}, {y})") # Debug statement
         return False
 
-    if not backtrack(95, 0):
+    if not backtrack(9, 0):
         print("No solution found")
     return solution, path
 
@@ -69,7 +69,7 @@ def solve_maze_las_vegas(maze):
     path = []
     directions = [(1, 0), (0, 1), (-1, 0), (0, -1)]
 
-    x, y = 0, 0
+    x, y = 9, 0
     steps = 0
     while steps < 400 and not (x == rows - 1):
         if maze[x, y] == 0 and solution[x, y] == 0:
@@ -94,9 +94,9 @@ def solve_maze_las_vegas(maze):
 approach = input("Choose an approach (Backtracking or Las Vegas): ").strip().lower()
 
 if approach == "backtracking":
-    solution, path = solve_maze_backtracking(maze)
+    solution, path = solve_maze_backtracking(resized_maze)
 elif approach == "las vegas":
-    solution, path = solve_maze_las_vegas(maze)
+    solution, path = solve_maze_las_vegas(resized_maze)
 else:
     print("Invalid approach selected")
 
@@ -113,21 +113,4 @@ def visualize_path(maze, path, title):
     plt.title(title)
     plt.show()
 
-visualize_path(maze, path, f"{approach.capitalize()} Path")
-
-
-# Calculate success rates
-def calculate_success_rate(solver_func, maze, runs):
-    success_count = 0
-    for _ in range(runs):
-        _, path = solver_func(maze)
-        if path and path[-1][0] == maze.shape[0] - 1:
-            success_count += 1
-    return success_count / runs
-
-backtracking_success_rate = calculate_success_rate(solve_maze_backtracking, maze, 10000)
-las_vegas_success_rate = calculate_success_rate(solve_maze_las_vegas, maze, 10000)
-
-# Print success rates
-print(f"Backtracking Success Rate: {backtracking_success_rate * 100:.2f}%")
-print(f"Las Vegas Success Rate: {las_vegas_success_rate * 100:.2f}%")
+visualize_path(resized_maze, path, f"{approach.capitalize()} Path")
