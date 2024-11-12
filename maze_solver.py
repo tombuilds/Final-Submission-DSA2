@@ -8,7 +8,7 @@ import time
 maze_img = mpimg.imread('maze-2.png')
 
 # Convert the image to a binary maze (0 for paths, 1 for walls)
-maze = (np.mean(maze_img, axis=2) < 0.5).astype(int)  # Adjust threshold if necessary
+maze = (np.mean(maze_img, axis=2) < 0.5).astype(int)
 
 # Find the bounding box manually
 rows = np.any(maze, axis=1)
@@ -30,7 +30,7 @@ for y in range(21):
 
 # Display the resized maze
 plt.imshow(resized_maze, cmap='gray_r')
-plt.axis('off')  # Hide the axes
+plt.axis('off')
 plt.title('Maze')
 plt.show()
 
@@ -142,8 +142,8 @@ def calculate_success_rate(solver_func, maze, runs):
 #Calculate start time
 start_time = time.time()
 
-backtracking_success_rate = calculate_success_rate(solve_maze_backtracking, resized_maze, 100)
-las_vegas_success_rate = calculate_success_rate(solve_maze_las_vegas, resized_maze, 100)
+backtracking_success_rate = calculate_success_rate(solve_maze_backtracking, resized_maze, 10000)
+las_vegas_success_rate = calculate_success_rate(solve_maze_las_vegas, resized_maze, 10000)
 
 # Print success rates
 print(f"Backtracking Success Rate: {backtracking_success_rate * 100:.2f}%")
