@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 import numpy as np
 import random
+import time
 
 # Load the maze image
 maze_img = mpimg.imread('maze-2.png')
@@ -63,6 +64,7 @@ def solve_maze_backtracking(maze):
         print("No solution found")
     return solution, path
 
+
 def solve_maze_las_vegas(maze):
     rows, cols = maze.shape
     solution = np.zeros((rows, cols), dtype=int)
@@ -72,11 +74,11 @@ def solve_maze_las_vegas(maze):
     x, y = 9, 0  # Starting position
     steps = 0
     exit_found = False
-    while steps < 400:
+    while steps <= 400:
+        print(f"Visiting: ({x}, {y}), Steps: {steps}")  # Debug statement
         if maze[y, x] == 0 and solution[y, x] == 0:
             solution[y, x] = 1
             path.append((x, y))
-            print(f"Visiting: ({x}, {y}), Steps: {steps}")  # Debug statement
             if (x == cols - 1 or y == rows - 1):
                 print("Exit found!")  # Debug statement
                 exit_found = True
@@ -95,6 +97,7 @@ def solve_maze_las_vegas(maze):
         else:
             # If the current position is invalid, restart from a random location
             x, y = random.randint(0, rows - 1), random.randint(0, cols - 1)
+        
         steps += 1
 
     if not exit_found and steps >= 400:
@@ -125,3 +128,26 @@ def visualize_path(maze, path, title):
     plt.show()
 
 visualize_path(resized_maze, path, f"{approach.capitalize()} Path")
+
+
+# Calculate success rates
+def calculate_success_rate(solver_func, maze, runs):
+    success_count = 0
+    for _ in range(runs):
+        _, path = solver_func(maze)
+        if path and path[-1] == (11, 20):
+            success_count += 1
+    return success_count / runs
+
+#Calculate start time
+start_time = time.time()
+
+backtracking_success_rate = calculate_success_rate(solve_maze_backtracking, resized_maze, 100)
+las_vegas_success_rate = calculate_success_rate(solve_maze_las_vegas, resized_maze, 100)
+
+# Print success rates
+print(f"Backtracking Success Rate: {backtracking_success_rate * 100:.2f}%")
+print(f"Las Vegas Success Rate: {las_vegas_success_rate * 100:.2f}%")
+
+#Calculate end time
+print(time.time()-start_time)
